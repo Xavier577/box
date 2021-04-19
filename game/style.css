@@ -1,0 +1,57 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: whitesmoke;
+}
+
+/* colors used for the game components */
+:root {
+  --color-1: #ff0000;
+  --color-2: #000000;
+  --color-3: #d3c2c2;
+  --color-4: #2b547a;
+  --color-5: #3d0d3d;
+  --color-6: #4f128b;
+  --color-7: #00c210;
+}
+#start-button {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 1s;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bolder;
+  cursor: pointer;
+}
+.display-none {
+  display: none;
+}
+.controls {
+  display: flex !important;
+  flex-direction: column;
+}
+.up,
+.down {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: 800;
+  transform: 1s;
+}
+.up:hover,
+.down:hover {
+  background-color: black;
+  color: whitesmoke;
+}
+button:focus {
+  outline: none;
+}
+canvas {
+  border: 1px solid #d3d3d3;
+}
