@@ -23,8 +23,8 @@ interface Game {
   clear: Function;
   interval?: number;
   frameRate: number;
-  /* 
   stop: Function;
+  /* 
   remove: Function; */
 }
 interface Component {
@@ -37,8 +37,8 @@ interface Component {
   moveUp: Function;
   moveDown: Function;
   updatePosition: Function;
-  /*  
   crashWith: Function;
+  /*  
   moveLeft: Function;
   moveRight: Function; */
 }
@@ -57,7 +57,7 @@ let gameArea: Game = {
     createGameArea();
     gameBox.draw();
     makeObstacles();
-    this.interval = setInterval(this.updateGameArea, 5);
+    this.interval = setInterval(this.updateGameArea, 20);
   },
   clear: function () {
     this.context?.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -68,6 +68,9 @@ let gameArea: Game = {
     gameBox.updatePosition();
     gameBox.draw();
     moveObstacles();
+  },
+  stop: function () {
+    clearInterval(this.interval);
   },
 };
 
@@ -117,6 +120,26 @@ class component {
     this.x += this.speedX;
     this.draw();
   }
+  public crashWith(obstacle: Component) {
+    // box properties
+    let boxLeft = this.x;
+    let boxRight = this.x + this.width;
+    let boxTop = this.y;
+    let boxBottom = this.y + this.height;
+    // obstacle properties
+    let obstaclesLeft = obstacle.x;
+    let obstacleRight = obstacle.x + obstacle.width;
+    let obstacleTop = obstacle.y;
+    let obstacleBottom = obstacle.y + obstacle.height;
+    let crash = true;
+    boxBottom < obstacleTop ||
+    boxTop > obstacleBottom ||
+    boxRight < obstaclesLeft ||
+    boxLeft > obstacleRight
+      ? (crash = false)
+      : null;
+    return crash;
+  }
 }
 
 // game functions features and others
@@ -150,14 +173,14 @@ function makeObstacles(): void {
   let x: number = gameArea.canvas.width;
   let y: number = gameArea.canvas.height - height;
   let randomIndex = Math.floor(Math.random() * 5);
-  Obstacles.push(new component(x, y, colors[randomIndex], width, height));
+  Obstacles.push(new component(x, 400, colors[randomIndex], width, 500));
   Obstacles.push(new component(x, 0, colors[randomIndex], width, height));
   Obstacles.forEach((obstacle) => obstacle.draw());
 }
 
 function randomGap(): number {
-  let minGap: number = 100;
-  let maxGap: number = 600;
+  let minGap: number = 80;
+  let maxGap: number = 150;
   let gap: number = Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
   return gap;
 }
@@ -170,7 +193,15 @@ function moveObstacles(): void {
     gameArea.frameRate = 0;
   }
   for (let i = 0; i < Obstacles.length; i++) {
+    if (gameBox.crashWith(Obstacles[i])) {
+      gameArea.stop();
+    }
     Obstacles[i].x -= 1;
+    if (Obstacles[i].y === 0) {
+      Obstacles[i].height += Math.random() * 0.2;
+    } else {
+      Obstacles[i].y -= Math.random() * 0.3;
+    }
     Obstacles[i].draw();
   }
   gameArea.frameRate += 1;
