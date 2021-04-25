@@ -18,8 +18,7 @@ let gameArea = {
     frameRate: 0,
     start: function () {
         createGameArea();
-        gameBox.draw();
-        makeObstacles();
+        makegameBox();
         this.interval = setInterval(this.updateGameArea, 20);
     },
     clear: function () {
@@ -28,13 +27,21 @@ let gameArea = {
     },
     updateGameArea: function () {
         gameArea.clear();
-        gameBox.draw();
-        gameBox.updatePosition();
-        gameBox.draw();
+        updateBoxPosition();
         moveObstacles();
     },
     stop: function () {
         clearInterval(this.interval);
+        removeControls();
+        showGameOverScreen();
+    },
+    restart: function () {
+        Obstacles = [];
+        gameBox.reset();
+        this.start();
+    },
+    remove: function () {
+        this.canvas.remove();
     },
 };
 // class for creating components
@@ -45,7 +52,8 @@ class component {
         this.color = color;
         this.width = width;
         this.height = height;
-        this.speedX = 0;
+        this.initialX = x;
+        this.initialY = y;
         this.speedY = 0;
     }
     draw() {
@@ -58,17 +66,28 @@ class component {
     clear() {
         ctx === null || ctx === void 0 ? void 0 : ctx.clearRect(this.x, this.y, this.width, this.height);
     }
+    retrieveInitialCordinates() {
+        const x = this.initialX;
+        const y = this.initialY;
+        return [x, y];
+    }
     moveUp() {
-        this.speedY -= 0.5;
+        this.speedY -= 1;
     }
     moveDown() {
-        this.speedY += 0.5;
+        this.speedY += 1;
     }
     updatePosition() {
         this.clear();
+        if (this.y <= 0) {
+            this.speedY = 0;
+            this.moveDown();
+        }
+        if (this.y >= gameArea.canvas.height - this.height) {
+            this.speedY = 0;
+            this.moveUp();
+        }
         this.y += this.speedY;
-        this.x += this.speedX;
-        this.draw();
     }
     crashWith(obstacle) {
         // box properties
@@ -90,10 +109,29 @@ class component {
             : null;
         return crash;
     }
+    reset() {
+        this.clear();
+        let initailCordinates = this.retrieveInitialCordinates();
+        this.x = initailCordinates[0];
+        this.y = initailCordinates[1];
+        this.speedY = 0;
+        this.updatePosition();
+        this.draw();
+    }
+}
+// assigning components
+function makegameBox() {
+    let verticalCenter = gameArea.canvas.height / 2;
+    gameBox = new component(10, verticalCenter, "#000000", 20, 20);
+    gameBox.draw();
+}
+function updateBoxPosition() {
+    gameBox.updatePosition();
+    gameBox.draw();
 }
 // game functions features and others
 function startGame() {
-    start_button.remove();
+    start_button === null || start_button === void 0 ? void 0 : start_button.remove();
     gameArea.start();
     addControls();
 }
@@ -108,7 +146,6 @@ function createGameArea() {
     ctx.fillRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
     document.body.insertBefore(gameArea.canvas, document.body.childNodes[0]);
 }
-gameBox = new component(10, 120, "#000000", 20, 20);
 function makeObstacles() {
     let minHeight = 40;
     let maxHeight = 100;
@@ -118,14 +155,14 @@ function makeObstacles() {
     let width = minWidth + Math.random() * (maxWidth - minWidth + 1);
     let x = gameArea.canvas.width;
     let y = gameArea.canvas.height - height;
-    let randomIndex = Math.floor(Math.random() * 5);
+    let randomIndex = Math.floor(Math.random() * 4);
     Obstacles.push(new component(x, 400, colors[randomIndex], width, 500));
     Obstacles.push(new component(x, 0, colors[randomIndex], width, height));
     Obstacles.forEach((obstacle) => obstacle.draw());
 }
 function randomGap() {
     let minGap = 80;
-    let maxGap = 150;
+    let maxGap = 90;
     let gap = Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
     return gap;
 }
@@ -140,13 +177,14 @@ function moveObstacles() {
     for (let i = 0; i < Obstacles.length; i++) {
         if (gameBox.crashWith(Obstacles[i])) {
             gameArea.stop();
+            Obstacles.forEach((obstacle) => obstacle.clear());
         }
-        Obstacles[i].x -= 1;
+        Obstacles[i].x -= 2;
         if (Obstacles[i].y === 0) {
-            Obstacles[i].height += Math.random() * 0.2;
+            Obstacles[i].height += Math.random() * 1;
         }
         else {
-            Obstacles[i].y -= Math.random() * 0.3;
+            Obstacles[i].y -= Math.random() * 1;
         }
         Obstacles[i].draw();
     }
@@ -158,20 +196,35 @@ function everyInterval(n) {
     }
     return false;
 }
+function restartGame() {
+    gameArea.clear();
+    removeGameOverScreen();
+    gameArea.restart();
+    addControls();
+}
+function gameOver() {
+    let gameOver = false;
+    Obstacles.forEach((obstacle) => {
+        if (gameBox.crashWith(obstacle)) {
+            gameOver = true;
+        }
+    });
+    return gameOver;
+}
+// dom functions
 function addControls() {
     controls.classList.replace("display-none", "controls");
 }
-/*
-
 function removeControls() {
-  controls.classList.replace("controls", "display-none");
+    controls.classList.replace("controls", "display-none");
 }
-function showGameOverScreen(): void {
-  gameOverScreen.classList.replace("display-none", "game-over-screen");
+function showGameOverScreen() {
+    gameArea.remove();
+    gameOverScreen.classList.replace("display-none", "game-over-screen");
 }
 function removeGameOverScreen() {
-  gameOverScreen.classList.replace("game-over-screen", "display-none");
-} */
+    gameOverScreen.classList.replace("game-over-screen", "display-none");
+}
 // controls logic
 function handleKeyControls(key) {
     if (key.key === "ArrowUp") {
@@ -182,26 +235,11 @@ function handleKeyControls(key) {
         gameBox.moveDown();
         return;
     }
-    /* if (key.key === "ArrowLeft") {
-      gameBox.moveLeft();
-      return;
-    }
-    if (key.key === "ArrowRight") {
-      gameBox.moveRight();
-      return;
-    } */
     return;
 }
 // event listeners
-/*
-restart_button.addEventListener("click", () => {
-  removeGameOverScreen();
-  addControls();
-});
-*/
-document.addEventListener("keydown", (key) => handleKeyControls(key), {
-    once: false,
-});
-up_button.addEventListener("click", () => gameBox.moveUp(), { once: false });
+document.addEventListener("keyup", (key) => handleKeyControls(key));
+up_button.addEventListener("click", () => gameBox.moveUp());
 down_button.addEventListener("click", () => gameBox.moveDown());
 start_button.addEventListener("click", (button) => startGame());
+restart_button.addEventListener("click", () => restartGame());
