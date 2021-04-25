@@ -56,15 +56,12 @@ let gameArea: Game = {
   start: function () {
     createGameArea();
     gameBox.draw();
-    makeObstacles();
     this.interval = setInterval(this.updateGameArea, 20);
   },
   clear: function () {
     this.context?.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
-  stop: function () {
-    clearInterval(this.interval);
-  },
+
   updateGameArea: function () {
     gameArea.clear();
     gameBox.draw();
@@ -144,6 +141,8 @@ class component {
     return crash;
   }
 }
+// assigning components
+gameBox = new component(10, 120, "#000000", 20, 20);
 
 // game functions features and others
 
@@ -164,8 +163,6 @@ function createGameArea(): void {
   document.body.insertBefore(gameArea.canvas, document.body.childNodes[0]);
 }
 
-gameBox = new component(10, 120, "#000000", 20, 20);
-
 function makeObstacles(): void {
   let minHeight: number = 40;
   let maxHeight: number = 100;
@@ -183,7 +180,7 @@ function makeObstacles(): void {
 
 function randomGap(): number {
   let minGap: number = 80;
-  let maxGap: number = 150;
+  let maxGap: number = 100;
   let gap: number = Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
   return gap;
 }
@@ -201,9 +198,9 @@ function moveObstacles(): void {
     }
     Obstacles[i].x -= 1;
     if (Obstacles[i].y === 0) {
-      Obstacles[i].height += Math.random() * 0.2;
+      Obstacles[i].height += Math.random() * 0.5;
     } else {
-      Obstacles[i].y -= Math.random() * 0.3;
+      Obstacles[i].y -= Math.random() * 0.5;
     }
     Obstacles[i].draw();
   }
