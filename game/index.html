@@ -6,13 +6,18 @@
     <meta name="viewport" content="width=\, initial-scale=1.0" />
     <title>Box</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="../main/script.js" defer></script>
+    <script src="./script.js" defer></script>
   </head>
   <body>
-    <button id="start-button">Start</button>
-    <div class="display-none">
+    <button class="start-button" data-start-button>Start</button>
+    <div class="display-none" data-controls>
       <button class="up">&#8593;</button>
       <button class="down">&#8595;</button>
+    </div>
+    <div class="display-none" data-game-over>
+      <h1>Game Over!</h1>
+      <strong>Score: <span id="score" data-score>0</span></strong>
+      <button class="retry" data-restart>Retry</button>
     </div>
   </body>
 </html>
