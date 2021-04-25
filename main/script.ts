@@ -23,8 +23,8 @@ interface Game {
   clear: Function;
   interval?: number;
   frameRate: number;
-  /* 
   stop: Function;
+  /* 
   remove: Function; */
 }
 interface Component {
@@ -61,6 +61,9 @@ let gameArea: Game = {
   },
   clear: function () {
     this.context?.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  },
+  stop: function () {
+    clearInterval(this.interval);
   },
   updateGameArea: function () {
     gameArea.clear();
