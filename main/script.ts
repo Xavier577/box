@@ -24,8 +24,8 @@ interface Game {
   interval?: number;
   frameRate: number;
   stop: Function;
-  /* 
-  remove: Function; */
+  restart: Function;
+  remove: Function;
 }
 interface Component {
   x: number;
@@ -34,6 +34,8 @@ interface Component {
   width: number;
   height: number;
   draw: Function;
+  clear: Function;
+  reset: Function;
   moveUp: Function;
   moveDown: Function;
   updatePosition: Function;
@@ -55,7 +57,7 @@ let gameArea: Game = {
   frameRate: 0,
   start: function () {
     createGameArea();
-    gameBox.draw();
+    makegameBox();
     this.interval = setInterval(this.updateGameArea, 20);
   },
   clear: function () {
@@ -64,13 +66,21 @@ let gameArea: Game = {
 
   updateGameArea: function () {
     gameArea.clear();
-    gameBox.draw();
-    gameBox.updatePosition();
-    gameBox.draw();
+    updateBoxPosition();
     moveObstacles();
   },
   stop: function () {
     clearInterval(this.interval);
+    removeControls();
+    showGameOverScreen();
+  },
+  restart: function () {
+    Obstacles = [];
+    gameBox.reset();
+    this.start();
+  },
+  remove: function () {
+    this.canvas.remove();
   },
 };
 
@@ -81,7 +91,8 @@ class component {
   color: string;
   width: number;
   height: number;
-  speedX: number;
+  initialX: number;
+  initialY: number;
   speedY: number;
 
   constructor(
@@ -96,31 +107,43 @@ class component {
     this.color = color;
     this.width = width;
     this.height = height;
-    this.speedX = 0;
+    this.initialX = x;
+    this.initialY = y;
     this.speedY = 0;
   }
-  public draw() {
+  public draw(): void {
     ctx = gameArea.context as CanvasRenderingContext2D;
     if (ctx === null) return;
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
-  private clear() {
+  public clear(): void {
     ctx?.clearRect(this.x, this.y, this.width, this.height);
   }
+  private retrieveInitialCordinates(): number[] {
+    const x = this.initialX;
+    const y = this.initialY;
+    return [x, y];
+  }
   public moveUp() {
-    this.speedY -= 0.5;
+    this.speedY -= 1;
   }
   public moveDown() {
-    this.speedY += 0.5;
+    this.speedY += 1;
   }
-  public updatePosition() {
+  public updatePosition(): void {
     this.clear();
+    if (this.y <= 0) {
+      this.speedY = 0;
+      this.moveDown();
+    }
+    if (this.y >= gameArea.canvas.height - this.height) {
+      this.speedY = 0;
+      this.moveUp();
+    }
     this.y += this.speedY;
-    this.x += this.speedX;
-    this.draw();
   }
-  public crashWith(obstacle: Component) {
+  public crashWith(obstacle: Component): boolean {
     // box properties
     let boxLeft = this.x;
     let boxRight = this.x + this.width;
@@ -140,14 +163,31 @@ class component {
       : null;
     return crash;
   }
+  public reset(): void {
+    this.clear();
+    let initailCordinates = this.retrieveInitialCordinates();
+    this.x = initailCordinates[0];
+    this.y = initailCordinates[1];
+    this.speedY = 0;
+    this.updatePosition();
+    this.draw();
+  }
 }
 // assigning components
-gameBox = new component(10, 120, "#000000", 20, 20);
+function makegameBox() {
+  let verticalCenter: number = gameArea.canvas.height / 2;
+  gameBox = new component(10, verticalCenter, "#000000", 20, 20);
+  gameBox.draw();
+}
+function updateBoxPosition() {
+  gameBox.updatePosition();
+  gameBox.draw();
+}
 
 // game functions features and others
 
 function startGame(): void {
-  start_button.remove();
+  start_button?.remove();
   gameArea.start();
   addControls();
 }
@@ -172,7 +212,7 @@ function makeObstacles(): void {
   let width: number = minWidth + Math.random() * (maxWidth - minWidth + 1);
   let x: number = gameArea.canvas.width;
   let y: number = gameArea.canvas.height - height;
-  let randomIndex = Math.floor(Math.random() * 5);
+  let randomIndex = Math.floor(Math.random() * 4);
   Obstacles.push(new component(x, 400, colors[randomIndex], width, 500));
   Obstacles.push(new component(x, 0, colors[randomIndex], width, height));
   Obstacles.forEach((obstacle) => obstacle.draw());
@@ -180,7 +220,7 @@ function makeObstacles(): void {
 
 function randomGap(): number {
   let minGap: number = 80;
-  let maxGap: number = 100;
+  let maxGap: number = 90;
   let gap: number = Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
   return gap;
 }
@@ -195,12 +235,13 @@ function moveObstacles(): void {
   for (let i = 0; i < Obstacles.length; i++) {
     if (gameBox.crashWith(Obstacles[i])) {
       gameArea.stop();
+      Obstacles.forEach((obstacle) => obstacle.clear());
     }
-    Obstacles[i].x -= 1;
+    Obstacles[i].x -= 2;
     if (Obstacles[i].y === 0) {
-      Obstacles[i].height += Math.random() * 0.5;
+      Obstacles[i].height += Math.random() * 1;
     } else {
-      Obstacles[i].y -= Math.random() * 0.5;
+      Obstacles[i].y -= Math.random() * 1;
     }
     Obstacles[i].draw();
   }
@@ -214,23 +255,38 @@ function everyInterval(n: number): boolean {
   return false;
 }
 
+function restartGame() {
+  gameArea.clear();
+  removeGameOverScreen();
+  gameArea.restart();
+  addControls();
+}
+function gameOver(): boolean {
+  let gameOver = false;
+  Obstacles.forEach((obstacle) => {
+    if (gameBox.crashWith(obstacle)) {
+      gameOver = true;
+    }
+  });
+  return gameOver;
+}
+
+// dom functions
 function addControls(): void {
   controls.classList.replace("display-none", "controls");
 }
-
-/* 
-
 function removeControls() {
   controls.classList.replace("controls", "display-none");
 }
 function showGameOverScreen(): void {
+  gameArea.remove();
   gameOverScreen.classList.replace("display-none", "game-over-screen");
 }
 function removeGameOverScreen() {
   gameOverScreen.classList.replace("game-over-screen", "display-none");
-} */
-// controls logic
+}
 
+// controls logic
 function handleKeyControls(key: KeyboardEvent): void {
   if (key.key === "ArrowUp") {
     gameBox.moveUp();
@@ -240,29 +296,12 @@ function handleKeyControls(key: KeyboardEvent): void {
     gameBox.moveDown();
     return;
   }
-  /* if (key.key === "ArrowLeft") {
-    gameBox.moveLeft();
-    return;
-  }
-  if (key.key === "ArrowRight") {
-    gameBox.moveRight();
-    return;
-  } */
   return;
 }
 
 // event listeners
-
-/* 
-restart_button.addEventListener("click", () => {
-  removeGameOverScreen();
-  addControls();
-});
-*/
-
-document.addEventListener("keydown", (key) => handleKeyControls(key), {
-  once: false,
-});
-up_button.addEventListener("click", () => gameBox.moveUp(), { once: false });
+document.addEventListener("keyup", (key) => handleKeyControls(key));
+up_button.addEventListener("click", () => gameBox.moveUp());
 down_button.addEventListener("click", () => gameBox.moveDown());
 start_button.addEventListener("click", (button) => startGame());
+restart_button.addEventListener("click", () => restartGame());
