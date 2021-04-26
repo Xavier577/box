@@ -11,7 +11,7 @@ const restart_button = document.querySelector(
 const gameOverScreen = document.querySelector(
   "[data-game-over]"
 ) as HTMLDivElement;
-const score = document.querySelector("[data-score]");
+const Score = document.querySelector("[data-score]") as HTMLSpanElement;
 // type structure
 type Context = CanvasRenderingContext2D | null;
 
@@ -49,6 +49,7 @@ interface Component {
 let ctx: Context; // the iconic ctx lol
 let gameBox: Component;
 let Obstacles: Component[] = [];
+let score: number = 0;
 let colors: string[] = ["#ff0000", "#2b547a", "#00c210", "#4f128b"]; // colors for obstacles
 
 // game Area
@@ -73,6 +74,8 @@ let gameArea: Game = {
     clearInterval(this.interval);
     removeControls();
     showGameOverScreen();
+    score = Math.floor(score / (gameBox.x * 4));
+    Score.innerText = score.toString();
   },
   restart: function () {
     Obstacles = [];
@@ -238,6 +241,7 @@ function moveObstacles(): void {
       Obstacles.forEach((obstacle) => obstacle.clear());
     }
     Obstacles[i].x -= 2;
+    score += 1;
     if (Obstacles[i].y === 0) {
       Obstacles[i].height += Math.random() * 1;
     } else {
@@ -260,6 +264,7 @@ function restartGame() {
   removeGameOverScreen();
   gameArea.restart();
   addControls();
+  score = 0;
 }
 function gameOver(): boolean {
   let gameOver = false;

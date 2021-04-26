@@ -6,11 +6,12 @@ const up_button = document.querySelector(".up");
 const down_button = document.querySelector(".down");
 const restart_button = document.querySelector("[data-restart]");
 const gameOverScreen = document.querySelector("[data-game-over]");
-const score = document.querySelector("[data-score]");
+const Score = document.querySelector("[data-score]");
 // component
 let ctx; // the iconic ctx lol
 let gameBox;
 let Obstacles = [];
+let score = 0;
 let colors = ["#ff0000", "#2b547a", "#00c210", "#4f128b"]; // colors for obstacles
 // game Area
 let gameArea = {
@@ -34,6 +35,8 @@ let gameArea = {
         clearInterval(this.interval);
         removeControls();
         showGameOverScreen();
+        score = Math.floor(score / (gameBox.x * 4));
+        Score.innerText = score.toString();
     },
     restart: function () {
         Obstacles = [];
@@ -180,6 +183,7 @@ function moveObstacles() {
             Obstacles.forEach((obstacle) => obstacle.clear());
         }
         Obstacles[i].x -= 2;
+        score += 1;
         if (Obstacles[i].y === 0) {
             Obstacles[i].height += Math.random() * 1;
         }
@@ -201,6 +205,7 @@ function restartGame() {
     removeGameOverScreen();
     gameArea.restart();
     addControls();
+    score = 0;
 }
 function gameOver() {
     let gameOver = false;
