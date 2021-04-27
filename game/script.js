@@ -1,12 +1,16 @@
 "use strict";
 // selectors
-const start_button = document.querySelector("[data-start-button]");
+const Score = document.querySelector("[data-score]");
 const controls = document.querySelector("[data-controls]");
+const gameInfo = document.querySelector("[data-game-info]");
+const closeGameInfo = document.querySelector("[data-close]");
+const gameOverScreen = document.querySelector("[data-game-over]");
+// buttons
+const start_button = document.querySelector("[data-start-button]");
+const help_button = document.querySelector("[data-help]");
 const up_button = document.querySelector(".up");
 const down_button = document.querySelector(".down");
 const restart_button = document.querySelector("[data-restart]");
-const gameOverScreen = document.querySelector("[data-game-over]");
-const Score = document.querySelector("[data-score]");
 // component
 let ctx; // the iconic ctx lol
 let gameBox;
@@ -134,7 +138,8 @@ function updateBoxPosition() {
 }
 // game functions features and others
 function startGame() {
-    start_button === null || start_button === void 0 ? void 0 : start_button.remove();
+    start_button.remove();
+    help_button.remove();
     gameArea.start();
     addControls();
 }
@@ -147,7 +152,7 @@ function createGameArea() {
         return;
     ctx.fillStyle = "#e7e7e7";
     ctx.fillRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
-    document.body.insertBefore(gameArea.canvas, document.body.childNodes[0]);
+    document.body.insertBefore(gameArea.canvas, document.body.childNodes[3]);
 }
 function makeObstacles() {
     let minHeight = 40;
@@ -206,6 +211,17 @@ function restartGame() {
     gameArea.restart();
     addControls();
     score = 0;
+    help_button === null || help_button === void 0 ? void 0 : help_button.classList.replace("display-none", "help");
+}
+function showGameInstructions() {
+    gameInfo.classList.replace("display-none", "game-instructions");
+    start_button.style.display = "none";
+    help_button.style.display = "none";
+}
+function closeInstructions() {
+    gameInfo.classList.replace("game-instructions", "display-none");
+    start_button.style.display = "inline";
+    help_button.style.display = "inline";
 }
 function gameOver() {
     let gameOver = false;
@@ -226,6 +242,7 @@ function removeControls() {
 function showGameOverScreen() {
     gameArea.remove();
     gameOverScreen.classList.replace("display-none", "game-over-screen");
+    help_button === null || help_button === void 0 ? void 0 : help_button.classList.replace("help", "display-none");
 }
 function removeGameOverScreen() {
     gameOverScreen.classList.replace("game-over-screen", "display-none");
@@ -247,4 +264,6 @@ document.addEventListener("keyup", (key) => handleKeyControls(key));
 up_button.addEventListener("click", () => gameBox.moveUp());
 down_button.addEventListener("click", () => gameBox.moveDown());
 start_button.addEventListener("click", (button) => startGame());
+help_button.addEventListener("click", (button) => showGameInstructions());
+closeGameInfo.addEventListener("click", () => closeInstructions());
 restart_button.addEventListener("click", () => restartGame());

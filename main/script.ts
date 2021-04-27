@@ -1,17 +1,21 @@
 // selectors
+const Score = document.querySelector("[data-score]") as HTMLSpanElement;
+const controls = document.querySelector("[data-controls]") as HTMLDivElement;
+const gameInfo = document.querySelector("[data-game-info]") as HTMLDivElement;
+const closeGameInfo = document.querySelector("[data-close]") as HTMLSpanElement;
+const gameOverScreen = document.querySelector(
+  "[data-game-over]"
+) as HTMLDivElement;
+// buttons
 const start_button = document.querySelector(
   "[data-start-button]"
-) as HTMLElement;
-const controls = document.querySelector("[data-controls]") as HTMLDivElement;
+) as HTMLButtonElement;
+const help_button = document.querySelector("[data-help]") as HTMLButtonElement;
 const up_button = document.querySelector(".up") as HTMLButtonElement;
 const down_button = document.querySelector(".down") as HTMLButtonElement;
 const restart_button = document.querySelector(
   "[data-restart]"
 ) as HTMLButtonElement;
-const gameOverScreen = document.querySelector(
-  "[data-game-over]"
-) as HTMLDivElement;
-const Score = document.querySelector("[data-score]") as HTMLSpanElement;
 // type structure
 type Context = CanvasRenderingContext2D | null;
 
@@ -190,7 +194,8 @@ function updateBoxPosition() {
 // game functions features and others
 
 function startGame(): void {
-  start_button?.remove();
+  start_button.remove();
+  help_button.remove();
   gameArea.start();
   addControls();
 }
@@ -203,7 +208,7 @@ function createGameArea(): void {
   if (ctx === null) return;
   ctx.fillStyle = "#e7e7e7";
   ctx.fillRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
-  document.body.insertBefore(gameArea.canvas, document.body.childNodes[0]);
+  document.body.insertBefore(gameArea.canvas, document.body.childNodes[3]);
 }
 
 function makeObstacles(): void {
@@ -265,7 +270,20 @@ function restartGame() {
   gameArea.restart();
   addControls();
   score = 0;
+  help_button?.classList.replace("display-none", "help");
 }
+
+function showGameInstructions() {
+  gameInfo.classList.replace("display-none", "game-instructions");
+  start_button.style.display = "none";
+  help_button.style.display = "none";
+}
+function closeInstructions() {
+  gameInfo.classList.replace("game-instructions", "display-none");
+  start_button.style.display = "inline";
+  help_button.style.display = "inline";
+}
+
 function gameOver(): boolean {
   let gameOver = false;
   Obstacles.forEach((obstacle) => {
@@ -286,6 +304,7 @@ function removeControls() {
 function showGameOverScreen(): void {
   gameArea.remove();
   gameOverScreen.classList.replace("display-none", "game-over-screen");
+  help_button?.classList.replace("help", "display-none");
 }
 function removeGameOverScreen() {
   gameOverScreen.classList.replace("game-over-screen", "display-none");
@@ -309,4 +328,6 @@ document.addEventListener("keyup", (key) => handleKeyControls(key));
 up_button.addEventListener("click", () => gameBox.moveUp());
 down_button.addEventListener("click", () => gameBox.moveDown());
 start_button.addEventListener("click", (button) => startGame());
+help_button.addEventListener("click", (button) => showGameInstructions());
+closeGameInfo.addEventListener("click", () => closeInstructions());
 restart_button.addEventListener("click", () => restartGame());

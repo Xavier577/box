@@ -3,14 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Box</title>
     <link rel="stylesheet" href="style.css" />
     <script src="./script.js" defer></script>
     <link rel="icon" href="../img/jt.svg" />
   </head>
   <body>
-    <button class="start-button" data-start-button>Start</button>
+    <div>
+      <button class="start-button" data-start-button>Start</button>
+      <button class="help" data-help>Help</button>
+      <div class="display-none" data-game-info>
+        <nav class="navigation"><span id="close" data-close>&times;</span></nav>
+        <h1>Instructions</h1>
+        <p>
+          You are to guide the Box using the Arrow up key (or the &#8593; ) to
+          make the box move upwards and the Arrow down key (or the &#8595; ) to
+          make the box move downwards. The box will move continuosly in the
+          direction of the specified keypress or arrow click. Hope you enjoy my
+          first Typescript game &#X1F60A;.
+        </p>
+      </div>
+    </div>
     <div class="display-none" data-controls>
       <button class="up">&#8593;</button>
       <button class="down">&#8595;</button>
