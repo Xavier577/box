@@ -3,19 +3,13 @@ const Score = document.querySelector("[data-score]") as HTMLSpanElement;
 const controls = document.querySelector("[data-controls]") as HTMLDivElement;
 const gameInfo = document.querySelector("[data-game-info]") as HTMLDivElement;
 const closeGameInfo = document.querySelector("[data-close]") as HTMLSpanElement;
-const gameOverScreen = document.querySelector(
-  "[data-game-over]"
-) as HTMLDivElement;
+const gameOverScreen = document.querySelector("[data-game-over]") as HTMLDivElement;
 // buttons
-const start_button = document.querySelector(
-  "[data-start-button]"
-) as HTMLButtonElement;
+const start_button = document.querySelector("[data-start-button]") as HTMLButtonElement;
 const help_button = document.querySelector("[data-help]") as HTMLButtonElement;
 const up_button = document.querySelector(".up") as HTMLButtonElement;
 const down_button = document.querySelector(".down") as HTMLButtonElement;
-const restart_button = document.querySelector(
-  "[data-restart]"
-) as HTMLButtonElement;
+const restart_button = document.querySelector("[data-restart]") as HTMLButtonElement;
 // type structure
 type Context = CanvasRenderingContext2D | null;
 
@@ -104,13 +98,7 @@ class component {
   initialY: number;
   speedY: number;
 
-  constructor(
-    x: number,
-    y: number,
-    color: string,
-    width: number,
-    height: number
-  ) {
+  constructor(x: number,y: number,color: string,width: number,height: number) {
     this.x = x;
     this.y = y;
     this.color = color;
