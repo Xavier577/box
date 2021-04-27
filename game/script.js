@@ -159,13 +159,16 @@ function updateBoxPosition() {
     gameBox.draw();
 }
 // game functions features and others
-function startGame() {
+function startSound() {
     let startSound = new sound("../assets/sounds/startGame.wav");
+    startSound.play();
+}
+function startGame() {
+    startSound();
     start_button.remove();
     help_button.remove();
     gameArea.start();
     addControls();
-    startSound.play();
 }
 function createGameArea() {
     gameArea.context = gameArea.canvas.getContext("2d");
@@ -230,6 +233,7 @@ function everyInterval(n) {
     return false;
 }
 function restartGame() {
+    startSound();
     gameArea.clear();
     removeGameOverScreen();
     gameArea.restart();

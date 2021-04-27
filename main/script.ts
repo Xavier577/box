@@ -217,14 +217,16 @@ function updateBoxPosition() {
 }
 
 // game functions features and others
-
-function startGame(): void {
+function startSound() {
   let startSound = new sound("../assets/sounds/startGame.wav");
+  startSound.play();
+}
+function startGame(): void {
+  startSound();
   start_button.remove();
   help_button.remove();
   gameArea.start();
   addControls();
-  startSound.play();
 }
 
 function createGameArea(): void {
@@ -292,6 +294,7 @@ function everyInterval(n: number): boolean {
 }
 
 function restartGame() {
+  startSound();
   gameArea.clear();
   removeGameOverScreen();
   gameArea.restart();
