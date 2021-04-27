@@ -77,6 +77,8 @@ let gameArea: Game = {
   stop: function () {
     clearInterval(this.interval);
     removeControls();
+    let gameOverSound = new sound("../assets/sounds/gameOver.mp3");
+    gameOverSound.play();
     showGameOverScreen();
     score = Math.floor(score / (gameBox.x * 4));
     Score.innerText = score.toString();
@@ -180,6 +182,29 @@ class component {
     this.draw();
   }
 }
+
+// for game sounds
+class sound {
+  sound: HTMLAudioElement;
+
+  constructor(src: string) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.addSound();
+  }
+  public addSound() {
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+  }
+  public play() {
+    this.sound.play();
+  }
+  public stop() {
+    this.sound.pause();
+  }
+}
 // assigning components
 function makegameBox() {
   let verticalCenter: number = gameArea.canvas.height / 2;
@@ -194,10 +219,12 @@ function updateBoxPosition() {
 // game functions features and others
 
 function startGame(): void {
+  let startSound = new sound("../assets/sounds/startGame.wav");
   start_button.remove();
   help_button.remove();
   gameArea.start();
   addControls();
+  startSound.play();
 }
 
 function createGameArea(): void {
@@ -282,16 +309,6 @@ function closeInstructions() {
   gameInfo.classList.replace("game-instructions", "display-none");
   start_button.style.display = "inline";
   help_button.style.display = "inline";
-}
-
-function gameOver(): boolean {
-  let gameOver = false;
-  Obstacles.forEach((obstacle) => {
-    if (gameBox.crashWith(obstacle)) {
-      gameOver = true;
-    }
-  });
-  return gameOver;
 }
 
 // dom functions
