@@ -38,9 +38,6 @@ interface Component {
   moveDown: Function;
   updatePosition: Function;
   crashWith: Function;
-  /*  
-  moveLeft: Function;
-  moveRight: Function; */
 }
 
 // component
